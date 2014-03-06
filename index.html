@@ -7,7 +7,7 @@ title: 彩程设计博客
   <ul class="posts">
     {% for post in paginator.posts %}
 	<div class="post">
-		<h2><a href="{{ post.url }}">{{ post.title }}</a></h2>
+		<h2><a href="{{ post.url | remove_first: '/' }}">{{ post.title }}</a></h2>
 		<p class="post-meta">
 			<span class="date">{{ post.date | date: "%Y年%-m月%-d日" }}</span>
 			{% if post.author %}
@@ -17,7 +17,7 @@ title: 彩程设计博客
 		<div class="post-content">
 			{% if post.content contains site.excerpt_separator %}
 			{{ post.excerpt }}
-			<p><a href="{{ post.url }}">继续阅读...</a></p>
+			<p><a href="{{ post.url | remove_first: '/' }}">继续阅读...</a></p>
 			{% else %}
 			{{ post.content }}
 			{% endif%}
@@ -28,11 +28,11 @@ title: 彩程设计博客
 	{% if paginator.total_pages > 1 %}
 	<div class="pagination">
 		{% if paginator.previous_page %}
-		<a class="link-prev-page" href="{{ paginator.previous_page_path }}">&laquo; 上一页</a>
+		<a class="link-prev-page" href="{{ paginator.previous_page_path | remove_first: '/' }}">&laquo; 上一页</a>
 		{% endif %}
 
 		{% if paginator.next_page %}
-		<a class="link-next-page" href="{{ paginator.next_page_path }}">下一页 &raquo;</a>
+		<a class="link-next-page" href="{{ paginator.next_page_path | remove_first: '/' }}">下一页 &raquo;</a>
 		{% endif %}
 	</div>
 	{% endif %}
