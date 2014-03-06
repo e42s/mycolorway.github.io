@@ -1,0 +1,60 @@
+---
+layout: post
+title: 基于jQuery的HTML逐帧播放器
+categories:
+- Web前端技术
+tags:
+- frameplayer
+- jQuery
+- 逐帧动画
+- 逐帧播放器
+status: publish
+type: post
+published: true
+meta:
+  syntaxhighlighter_encoded: '1'
+  _edit_last: '13'
+  _aioseop_title: 基于jQuery的HTML逐帧播放器
+  _aioseop_description: google.cn的导航大家一定不会陌生。在这个Web逐帧动画被flash统治的时代，基于HTML和JS的逐帧动画总是能让人感觉眼前一亮。由于公司新网站的“龙门阵”模块需要用到HTML的逐帧动画，我用jQuery写了一个逐帧播放器，这里共享出来，希望对童鞋们有所帮助。
+  views: '10658'
+  _aioseop_keywords: 逐帧播放器,逐帧动画,frameplayer,jQuery
+---
+<p>
+google.cn的导航大家一定不会陌生。在这个Web逐帧动画被flash统治的时代，基于HTML和JS的逐帧动画总是能让人感觉眼前一亮。存在即合理，与flash相比，HTML逐帧动画有着一些不可替代的优势，比如更好的可访问性、对搜索引擎更加友好等等，但是较高的技术门槛往往让众多开发人员望而却步。由于<a href="http://mycolorway.com" target="_blank">公司新网站</a>的“龙门阵”模块需要用到HTML的逐帧动画，我用jQuery写了一个简易逐帧播放器，这里共享出来，希望对童鞋们有所帮助。猛击看<strong>Demo</strong>。</p>
+<p>
+<!--more--></p>
+<h3>基本原理</h3>
+<p>
+HTML逐帧动画的基本原理跟老式的动画片一样，就是把画好的图片一张一张逐个显示出来：</p>
+<p><img src="http://farthinker.cn/wp-content/uploads/2009/09/anim.png" alt="播放的图片" title="播放的图片" width="260" height="37" class="alignnone size-full wp-image-166" /></p>
+<p>
+具体到技术上，就是把所有的帧横向排列到一张图片上作为舞台(stage)div的背景图，控制舞台的高(height)、宽(width)和背景图位置(background-position)，使舞台同一时间只能显示一帧的图像，然后每隔一段时间（由帧速决定）改变一次舞台的背景图位置，让下一帧显示出来，达到“播放”的效果。</p>
+<h3>API接口</h3>
+<p>
+有童鞋肯定会问，为什么不用gif图片来播放逐帧动画呢？原因就是gif动画无法用程序来控制，没有API接口。</p>
+<p><em>Options</em></p>
+<ul>
+<li>img ( String, required ): 被播放图片的路径。</li>
+<li>width ( Number, required ): 每一帧的宽度。</li>
+<li>height ( Number, required ): 每一帧的高度。</li>
+<li>framenum ( Number, required ): 总共有多少帧。</li>
+<li>framerate ( Number, optional ): 播放的帧速，默认为25。</li>
+<li>currentFrame ( Number, optional ): 当前处于第几帧，即从第几帧开始播放，默认为1。</li>
+<li>autoPlay ( Boolen, optional ): 是否在初始化之后自动播放，默认为true。</li>
+<li>reverse ( Boolen, optional ): 是否按倒序播放，默认为false。</li>
+<li>vPosition ( String, optional ): 舞台竖直方向的背景图位置，默认为"0px"。</li>
+</ul>
+<p><em>Methods</em></p>
+<ul>
+<li>.frameplayer( "play" ): 开始播放。</li>
+<li>.frameplayer( "pause" ): 暂停播放。</li>
+<li>.frameplayer( "stop" ): 停止播放，回到第一帧（倒序播放时跳到最后一帧）。</li>
+<li>.frameplayer( "options", newOptions ): 修改选项参数，可修改的参数见”Options“。</li>
+</ul>
+<p><em>Events</em></p>
+<ul>
+<li>.bind( "play", function ): 开始播放时触发。</li>
+<li>.bind( "pause", function ): 暂停播放时触发。</li>
+<li>.bind( "play", function ): 停止播放时触发。</li>
+<li>.bind( "complete", function ): 播放完毕时触发。</li>
+</ul>

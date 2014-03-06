@@ -1,0 +1,19 @@
+---
+layout: default
+---
+
+<div id="page-post">
+	<div class="post">
+		<h2>{{ page.title }}</a></h2>
+		<p class="post-meta">
+			<span class="date">{{ page.date | date: "%Y年%-m月%-d日" }}</span>
+			{% if page.author %}
+			<span class="author">{{ page.author }}</span>
+			{% endif %}
+		</p>
+		<div class="post-content">
+			{{ content }}
+		</div>
+	</div>
+</div>
+

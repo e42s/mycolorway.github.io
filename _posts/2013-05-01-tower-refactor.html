@@ -1,0 +1,190 @@
+---
+layout: post
+title: 记 tower.im 的一次重构
+categories:
+- Tower
+tags: []
+status: publish
+type: post
+published: true
+meta:
+  _edit_last: '2'
+  views: '12069'
+---
+<p><a rel="attachment wp-att-4097" href="http://blog.mycolorway.com/2013/05/01/tower-refactor/blog_rails_tower/"><img class="aligncenter size-full wp-image-4097" title="blog_rails_tower" src="http://blog.mycolorway.com/wp-content/uploads/2013/05/blog_rails_tower.jpg" alt="" width="600" height="450" /></a></p>
+<p><a href="http://tower.im" target="_blank">Tower.im</a>上线已经快半年了，这半年来我们团队小步快跑，为 tower 增加了许多新的功能，使它渐渐完善起来，在这个过程中，tower 的代码量也逐渐增加，随着时间的流逝，系统中积淀的糟糕的代码渐渐增多，于是趁着节假日的到来，花了些时间对代码做了部分重构，在这里记录下来，和大家分享。</p>
+<p>我们知道，重构代码，目的是为了对内让代码变得更精简，提高阅读性和可维护性，而对外不改变旧有的功能，所以首先应该分拆重构任务，一步步执行，不要想一次到位，其次，是通过测试用例保护重构过程，确保重构以后的代码仍然能正常工作。</p>
+<p>明确了目标和方法后，我们就可以进入具体的重构阶段了。Tower.im 使用 Ruby on Rails 这个 MVC 的 Web 框架开发，在代码的组织形式上，Rails 社区比较推崇 'Skinny Controller, Fat Model'，因此，这次的代码重构主要在 Controller 层和 Model 层进行。<br />
+<!--more--></p>
+<p>我们来看一个具体的例子。在 Tower 中，像任务、讨论、文档、文件这样的基础资源，都对应着自己的  Controller，比如任务对应着 todos_controller，讨论对应 messages_controller，这些 controllers 里面定义着一些接口方法，比如对这些基础资源进行增删改等等。在旧有代码中，最复杂的一个方法是为这些基础资源添加评论。这个方法的名称叫 comment，让我们看看老的代码长什么样：</p>
+<pre lang="ruby">def comment
+  @message = @project.messages.active.find_by_guid(params[:muid])
+  return render_404 if @message.blank?
+
+  content = params[:comment_content]
+  if 1 == paras['_wysihtml5_mode'].to_i
+    content.gsub! '</div>', '<br/></div>'
+    content = Sanitize.clean(content, Sanitize::Config::BASIC)
+  else
+    content = Sanitize.clean(content).gsub(/[\n\r]{1,2}/, '')
+  end 
+
+  if 20000 < content.bytesize
+    render json: { errors: [{msg: '内容最多支持 5000 字，太长了保存不了哦',
+      target: :comment_content}]}, status: 500
+    return
+  end 
+
+  attach_guids = params[:attach_guids].present? ? \
+    params[:attach_guids].split(',') : [] 
+
+  if content.blank?
+    if attach_guids.empty?
+      render json: {erros: [{msg: '没有输入内容哦',
+        target: :comment_content}]}, status: 500
+      return
+    else
+      pic_count = 0
+      filenames = attach_guids.map do |guid|
+        ta = current_member.tmp_attachments.find_by_guid(guid)
+        pic_count += 1 if ta.content_type.starts_with?('image/')
+        ta.name
+      end
+
+      content = ((0 &lt; pic_count ? "[#{pic_count}P]" : "") + \
+        filenames.join(', ')).truncate(200)
+    end
+  end 
+
+  @message.cc_members = params[:cc_guids].respond_to?(:split) ?\
+    params[:cc_guids].split(',') : []
+  @message.last_commentator = current_member
+  @message.last_comment_at = DateTime.now
+  @message.last_conn_guid = live_conn_guid
+  @message.save! 
+
+  comment = @message.comments.create(content: content,
+    creator: current_member, last_conn_guid: live_conn_guid) 
+
+  if attach_guids.any?
+    tmp_file_dir = "#{::Rails.root.join('files', 'tmp')}"
+    attach_guids.each_with_index do |guid, index|
+      ta = current_member.tmp_attachments.find_by_guid(guid)
+      tmp_file_path = File.join(tmp_file_dir, "#{ta.guid}")
+      tmp_file = File.open(tmp_file_path, 'r') 
+
+      comment.attachments.create(team: current_team, attachtarget: @project,
+        creator: current_member, byte_size: ta.byte_size,
+        content_type: ta.content_type, name: ta.name, file: tmp_file, position: index)
+    end
+  end 
+
+  comment.reload
+  comment.create_event_add(current_member)
+  comment.send_new_comment_emails(current_member) 
+
+  @message.reload 
+
+  render json: {
+    guid: comment.guid,
+    html: render_to_string(
+      partial: 'comments/comment',
+      locals: {comment: comment}
+    )
+  }
+end</pre>
+<p>是不是快崩溃了？这么长的代码，既难以阅读，也难以维护，必须重构。先让我们看看重构以后的结果：</p>
+<pre lang="ruby">def comment
+  return render_404 unless @message.is_active?
+
+  content, cc_members, attach_guids = comment_params
+  comment = @message.create_comment(content, current_member,
+    live_conn_guid, attach_guids, cc_members)
+
+  render json: {
+    guid: comment.guid,
+    html: render_to_string(
+      partial: 'comments/comment',
+      locals: { comment: comment }
+    )
+  }
+end</pre>
+<p>是不是好多了？我理解的重构的核心口诀是“拆”，把复杂代码中的逻辑进一步细分、拆散，放到它应该属于的地方。在拆的过程中，应该考虑到复用，那些拆出来的逻辑应该最大程度的和其它代码共享，达到 <a href="http://en.wikipedia.org/wiki/Don%27t_Repeat_Yourself" target="_blank">DRY</a> 的目的。具体对于comment 这个接口来说，我们做了如下的几个重构的步骤：</p>
+<p><strong style="font-size:18px; color:#6f8a3d;">1. 在 controller 中使用 before_filter 注入全局对象</strong></p>
+<p>在 comment 方法的第一行，可以看到我们通过 find_by_guid 方法获取了 @message 对象，虽然只是一行代码，但是考虑到整个 messages_controller 里面，绝大多数方法都会复用它，所以可以在 controller 里面定义一个 before_filter 方法， 来为需要的接口注入 @message 对象：</p>
+<pre lang="ruby">before_filter :load_message_instance, only: [:comment]</pre>
+<p>only 后面可以指定这个 controller 里面有哪些方法是通过 load_message_instance 来注入 @message 变量，接下来，只需要在 messages_controller 里面定义一个 load_message_instance 的 private method 就可以了：</p>
+<pre lang="ruby">private
+
+  def load_message_instance
+    @message = @project.messages.find_by_guid! params.fetch :muid
+  end</pre>
+<p>这样首先通过 before_filter，DRY 掉了 controller 里面绝大多数方法重复的一行代码，虽然看上去微不足道，但是随着 controller 的扩展，积少成多，能让你的代码保持精简。</p>
+<p><strong style="font-size:18px; color:#6f8a3d;">2. 使用 params helpers 封装评论所需参数</strong></p>
+<p>我们知道，controller 中的方法很多时候只是做一个“中转”：接收 http 请求，获取 GET/POST 参数，对参数进行处理后，交由 model 层对数据进行操作，最后将数据经过某种方式的 render 后，返还给浏览器。而在这个中转过程中，我们有大量的操作是在对请求参数做处理，比如在旧版本的 comment 方法中，我们对评论内容进行了过滤，对抄送的成员和附件进行了参数组装，这些操作其实可以放在一个 helper 方法里面来完成，而且考虑到除了 messages_controller 外，其它资源对象的 comment 方法其实在最开始都会对参数进行同样的处理，所以我们可以直接把对 comment 方法的 params 处理封装成一个 application_helper 方法：</p>
+<pre lang="ruby">def comment_params
+  cc_members = params[:cc_members].respond_to? (:split) ? \
+    params[:cc_guids].split(',') : []
+  attach_guids = params[:attach_guids].present? ? \
+    params[:attach_guids].split(',') :[]
+  content = get_safe_content(params[:comment_content],
+                             1 == params['_wysihtml5_mode'].to_i,
+                             attach_guids)
+
+  [content, cc_members, attach_guids]
+end</pre>
+<p>可以看到，这个在 application_helper 中的方法，实际上只是对三个 POST 参数进行了相应的处理，最后以数组的形式返回，而这个 comment_params 方法中，又有一次小的重构，即通过 get_safe_content 方法对复杂的 content 进行处理，实际上这里仍然可以继续优化下去，不过就目前为止，已经足够了。这样，在messages_controller 里面，我们通过数组的连续赋值特性，就可以一行代码获取数据层实际上需要的数据了：</p>
+<pre lang="ruby">content, cc_members, attach_guids = comment_params</pre>
+<p>哇，这样又精简掉了一大堆丑陋的代码。</p>
+<p><strong style="font-size:18px; color:#6f8a3d;">3. 将模型验证放进模型中</strong></p>
+<p>细心的童鞋应该会发现，重构后的代码里面没有任何的错误处理，是我们去掉了这部分代码么？实际上并没有，在 Rails 里面，对数据的合法性验证往往是放在 model 层去处理的，controller 只需要“中转”，没必要去判断。Rails 的 model 类往往会使用一系列的 validators 来对数据进行合法性验证，比如旧有代码里面，我们需要对 content 的长度和是否为空进行判断，其实只需要在 comment 的 model 里，用一个 validates 语句就能搞定：</p>
+<pre lang="ruby">validates :content,
+          presence: { message: "没有输入内容哦" },
+          length: { maximum: 20000,
+                    too_long: "内容最多支持 5000 字，太长了保存不了哦" }</pre>
+<p>这样，当 content 本身为空，或者超过长度限制的时候，model 会直接 raise 错误信息，当然，更进一步的，你还可以把错误信息本身放到 I18n 里面，全站复用。</p>
+<p>这个改动涉及到 Rails 框架本身的习惯，你当然也可以在 controller 层去做数据验证，但是使用 model 层自己的 validates，才是在正确的地点，做正确的事情。</p>
+<p><strong style="font-size:18px; color:#6f8a3d;">4. 使用Concerns抽象模型结构</strong></p>
+<p>最后，是这次优化的重头戏。Rails 社区虽然提倡 'Skinny Controller, Fat Model'，但在实际开发中，太 fat 的 model 层也是很让人头疼的，所以我们引入了Concerns 机制来对模型层进一步做抽象。关于 Concerns ，大家可以参考DHH的这篇文章：<a href="http://37signals.com/svn/posts/3372-put-chubby-models-on-a-diet-with-concerns" target="_blank">Put chubby models on a diet with concerns</a>。</p>
+<p>对于 tower 来说，基础资源都可以被评论，这个意思是指，每个基础资源的模型都 has_many comments，每个基础资源的模型都有一个 cc_members 字段保存着当前的抄送成员的 id 数组，在 model 中也有一系列的方法来实现对 cc_members 的操作，这些代码其实大部分都可以重用，而且它们都从侧面反映出一个实时，就是基础资源模型本身，应该是一个 commentable 的抽象。因此，我们可以使用 concerns 实现这个抽象：</p>
+<pre lang="ruby">module Extensions
+  module Commentable
+    extend ActiveSupport::Concern
+
+    included do
+      has_many: comments, as: :commentable, dependent: :delete_all
+      belongs_to :last_commentator, class_name: :Member
+    end
+
+    def create_comment(content, creator, live_conn_guid, attach_guids, cc_members)
+      # 具体代码省略
+    end
+
+    def cc_members= (guids)
+      # 具体代码省略
+    end
+
+    def cc_members
+      # 具体代码省略
+    end
+
+    def cc_member_add(member)
+      # 具体代码省略
+    end
+  end
+end</pre>
+<p>可以看到，在这个 Commentable 里面，我们抽出了所有 Commentable 对象所应该具有的关系，并且创建了一系列的方法供基础资源使用，这些方法不是接口方法，它们不仅定义了方法名称和参数，还实际提供相应的功能，在完成了这个 concern 以后，我们就可以通过 Module Mixin 的方法，把这个 commentable concern 混入所有基础资源模型里面了：</p>
+<pre lang="ruby">class Message < ActiveRecord::Base
+  include Extensions::Commentable
+end</pre>
+<p>这样，我们只需要在 @message 这个资源对象上调用 create_comment 方法，传入合适的参数，就能完成创建评论的操作了，核心还是，让 model 层去做关于数据的处理，controller 只需要做中间的中转即可。</p>
+<p>Concerns 非常强大，在 Tower 中，像 回收站(trashable)、星标(starable) 等很多功能，都能通过 Concerns 来做抽象，让代码保持简洁。在 Rails4 中，Concerns 也被默认加载，算是众望所归吧。</p>
+<p><strong style="font-size:18px; color:#6f8a3d;">总结</strong></p>
+<p>以上就是对 Tower.im 的一次简单的代码优化，当然，可以做的还有很多，不过目前这个 comment 方法已经可以让人轻松理解，我们的重构目的达到。</p>
+<p>再总结一下优化过程：在 Tower 里面拆分任务，小步改进（把复杂的代码先从方法中剥离出来，放到它应该放在的地方），跑通测试，然后循环往复。</p>
+<p>最后推荐大家一个网站：<a href="https://codeclimate.com/?v=b" target="_blank">Code Climate</a>，如果你的项目也使用Rails框架，可以把代码放到上面跑一跑，看看最后是个什么级别的呢？</p>
+<p><strong>参考文档</strong></p>
+<p><span style="font-size: 12px;">1、<a href="http://yedingding.com/2013/03/04/steps-to-refactor-controller-and-models-in-rails-projects.html" target="_blank">重构 Rails 项目之最佳实践</a></span><br />
+<span style="font-size: 12px;">2、<a href="http://terrytai.com/articles/f8796e81-refactor-session-for-re-education-in-thought-works" target="_blank">A Refactor Session for Re-education in ThoughtWorks</a></span><br />
+<span style="font-size: 12px;">3、<a href="http://37signals.com/svn/posts/3372-put-chubby-models-on-a-diet-with-concerns" target="_blank">Put chubby models on a diet with concerns</a></span><br />
+<span style="font-size: 12px;">4、<a href="http://blog.codeclimate.com/blog/2012/10/17/7-ways-to-decompose-fat-activerecord-models/" target="_blank">7 Patterns to Refactor Fat ActiveRecord Models</a></span></p>

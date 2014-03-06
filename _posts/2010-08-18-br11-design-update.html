@@ -1,0 +1,57 @@
+---
+layout: post
+title: 《牛壹周》1.1升级版的设计与功能改进
+categories:
+- iPhone/iPad
+- 用户体验设计
+tags:
+- ipad
+- 分享
+- 排版
+- 牛一周
+- 牛壹周
+- 设计
+status: publish
+type: post
+published: true
+meta:
+  _edit_last: '4'
+  views: '7112'
+---
+<p><a href="http://blog.mycolorway.com/wp-content/uploads/2010/08/br11.png"><img class="alignnone size-full wp-image-1361" title="br11" src="http://blog.mycolorway.com/wp-content/uploads/2010/08/br11.png" alt="" width="580" height="180" /></a></p>
+<p>从2010年7月30号《牛壹周》创刊号上架，截止到我写这篇Blog，已经有了接近6000个下载。</p>
+<p>作为一支从来不在出版或传媒圈混的团队所制作的第一本中文电子杂志，在几乎没做任何宣传的情况下，会有这么多的下载——说实在的，这样的成绩让我们自己也感到惊讶——古灵也没想到，他的生日礼物居然会被这么多人共同分享，并且乐在其中。</p>
+<p>一些热心的使用者在App Store上给了我们不错的评价和评级，还有一些热心的使用者则给我们写来了邮件——感谢你们对我们的鼓励和夸奖，但更要感谢的，是你们给我们的意见和建议——这让我们觉得如果不能很好的解决上一期你们所碰到和忍受的一些问题的话都不好意思再出第二期。好消息是现在大部分问题都解决了，坏消息是这让我们花费了一些时间，让周刊几乎变成了半月刊。</p>
+<p>8月16号，我们向苹果提交了《牛壹周》APP的1.1版，正在等待审批，估计一周过后能在App Store上架。安装过《牛壹周》的老用户，直接升级原来的应用程序即可，不需要重新安装新的APP。虽然1.1的版本号升位非常低调，但这个版本实际上已经进行了脱胎换骨的改变——内容格式从基于Html5+CSS3变成了基于PDF；导航方式变成了全新的“一阳指”式导航；体系架构上实现了书架（应用程序框架）和期刊（各期内容）分离。</p>
+<p>OK，现在让我们来看看在更新后的《牛壹周》1.1版中你会看到哪些改变。</p>
+<p><!--more--></p>
+<h4>1、更平滑的页面切换缓冲</h4>
+<p>《牛一周》创刊号发布后，最受诟病的就是页面切换的时候糟糕的缓冲体验——先是眼前一黑，然后一个白菊花（苹果的官方loading动画，也有人叫它风火轮）转啊转，耐心不好的，会以为这个程序已经或即将Crash掉了。</p>
+<p>[caption id="attachment_1350" align="aligncenter" width="580" caption="使用者在App Store上给我们留言反馈的页面缓冲问题很有代表性"]<a href="http://blog.mycolorway.com/wp-content/uploads/2010/08/bad.png"><img class="size-full wp-image-1350" title="bad" src="http://blog.mycolorway.com/wp-content/uploads/2010/08/bad.png" alt="使用者在App Store上给我们留言反馈的页面缓冲问题" width="580" height="146" /></a>[/caption]</p>
+<p>作为一个Apple App设计开发方面刚入行的团队，老实说，当初我们也没想到切换会消耗这么多资源，为了赶上给古灵老师的生日献礼，我们还是Getting Real了一把，在妥善解决好这个问题之前先放出去了——完美总是相对的；孩子总是要生的。</p>
+<p>现在《牛壹周》APP的1.1版已经彻底解决了页面缓冲问题，现在你在浏览文章切换页面的时候将是无缝的而且非常平滑，在你翻页操作停止后，程序将在后台开始预载其他页面。不过如果你不是一页页看，而是快速手动翻页，或者在导航区作长程跳转（比如从第一篇文章直接跳到第七篇文章），还是会出现一个很短暂的Loading——因为设备内存和性能方面的考量，我们只预载了当前浏览页的前后各五页，当你要浏览的内容不在预载范围内的时，就开始即时载入。我们这次所做的改进，不是要消灭Loading，而是让Loading足够快，顺便装可爱——你看，为了解决这问题，牛哥我也是囧到黑面忙到出汗，不足之处还请列位看官体谅体谅。</p>
+<p>[caption id="attachment_1351" align="aligncenter" width="254" caption="EN，牛哥我也有忙不过来的时候⋯⋯"]<a href="http://blog.mycolorway.com/wp-content/uploads/2010/08/loading.png"><img class="size-full wp-image-1351" title="loading" src="http://blog.mycolorway.com/wp-content/uploads/2010/08/loading.png" alt="EN，牛叔我也有忙不过来的时候⋯⋯" width="254" height="254" /></a>[/caption]</p>
+<h4>2、全新的“一阳指”导航系统</h4>
+<p>《牛壹周》创刊号的导航是个索引＋缩略的混合体系，使用的过程中你会发现其实你并不能在任何时间都通过同样一种操作很随意地到达包括封面在内的任意一页。</p>
+<p>这次发布的版本中，如果你单击屏幕会浮现出导航系统。通过下部的彩色导航条（不同色彩代表不同文章类型），现在你可以象操作横向滚动条一样在所有页面间的跳转并同步预览到文章标题、发布时间以及作者头像。</p>
+<p>[caption id="attachment_1352" align="aligncenter" width="450" caption="全新的“一阳指”导航体系"]<a href="http://blog.mycolorway.com/wp-content/uploads/2010/08/navigation.png"><img class="size-full wp-image-1352" title="navigation" src="http://blog.mycolorway.com/wp-content/uploads/2010/08/navigation.png" alt="全新的“一阳指”导航体系" width="450" height="600" /></a>[/caption]</p>
+<p>[caption id="attachment_1353" align="aligncenter" width="450" caption="目前《牛壹周》的栏目类型与色彩对应关系"]<a href="http://blog.mycolorway.com/wp-content/uploads/2010/08/color.png"><img class="size-full wp-image-1353" title="color" src="http://blog.mycolorway.com/wp-content/uploads/2010/08/color.png" alt="目前《牛壹周》的栏目类型与色彩对应关系" width="450" height="133" /></a>[/caption]</p>
+<p>另外我们发现《牛壹周》创刊号的目录页其实给一些使用者带来了困惑——首先，只有它是支持且需要纵向滚屏的；其次，很多人并没有意识到那些标题是可以点击的链接。这次我们把目录页内容也限制到了一屏完全显示——不需要滚屏，也不加超链，操作习惯和其他页面完全一致。</p>
+<p>[caption id="attachment_1369" align="aligncenter" width="450" caption="第一期创刊号的目录页，需要向下滚屏才能全部看完"]<a href="http://blog.mycolorway.com/wp-content/uploads/2010/08/menu_v.png"><img class="size-full wp-image-1369" title="menu_v" src="http://blog.mycolorway.com/wp-content/uploads/2010/08/menu_v.png" alt="第一期创刊号的目录页，需要向下滚屏才能全部看完" width="450" height="588" /></a>[/caption]</p>
+<p>[caption id="attachment_1354" align="aligncenter" width="450" caption="压缩为一屏展示的目录页"]<a href="http://blog.mycolorway.com/wp-content/uploads/2010/08/menu.png"><img class="size-full wp-image-1354" title="menu" src="http://blog.mycolorway.com/wp-content/uploads/2010/08/menu.png" alt="压缩为一屏展示的目录页" width="450" height="600" /></a>[/caption]</p>
+<h4>3、书架（程序框架）与期刊（每期内容）分离的体系</h4>
+<p>因为期刊已经出到了第二期而且以后会出更多期，所以“书架”的概念应运而生。导航条的左上部，是进入“书架”的入口，进入后，你可以切换看到当前和往期杂志的封面，如果你没下载过（封面半透明显示），点击后开始下载该期；如果你已下载（封面正常显示），那么点击后开始正式阅读该期。</p>
+<p>[caption id="attachment_1355" align="aligncenter" width="371" caption="点这里会进入“书架”"]<a href="http://blog.mycolorway.com/wp-content/uploads/2010/08/navi.png"><img class="size-full wp-image-1355" title="navi" src="http://blog.mycolorway.com/wp-content/uploads/2010/08/navi.png" alt="点这里会进入“书架”" width="371" height="246" /></a>[/caption]</p>
+<p>[caption id="attachment_1356" align="aligncenter" width="450" caption="进入“书架”后，你看到的会是最新一期的封面"]<a href="http://blog.mycolorway.com/wp-content/uploads/2010/08/cover.png"><img class="size-full wp-image-1356" title="cover" src="http://blog.mycolorway.com/wp-content/uploads/2010/08/cover.png" alt="进入“书架”后，你看到的会是最新一期的封面" width="450" height="600" /></a>[/caption]</p>
+<p>我们也曾考虑过是否要跟iBooks一样设计一个实体书架上去，但我们现在期数很少，觉得用一个书架有些大而无当，综合考虑后我们选用了这种最简洁明了的方式来做杂志切换导航——毕竟这本杂志的一个交互设计原则，就是简洁和实用，如非特别必要，我们一般会避免出现长期显示在界面上的按钮和操作提示。</p>
+<h4>4、更为简洁醒目的ICON</h4>
+<p>是的，上个版本的Icon设计花了我们不少心血，看上去也颇为精致漂亮，但是缩小后作为一个Apple App的图标，我们发现它的可识别性并不是太好——有一天次S为了分析她在华语地区的表现，选择了新加坡地区作为一个参考样本，结果在一堆App里面一眼扫过去，自己都找了两遍才找到我们的《牛壹周》。</p>
+<p>[caption id="attachment_1357" align="aligncenter" width="450" caption="在一堆APP里面，我们牛壹周的Icon并不那么醒目"]<a href="http://blog.mycolorway.com/wp-content/uploads/2010/08/icons_original.png"><img class="size-full wp-image-1357" title="icons_original" src="http://blog.mycolorway.com/wp-content/uploads/2010/08/icons_original.png" alt="在一堆APP里面，牛壹周的Icon并不那么引人注目" width="450" height="333" /></a>[/caption]</p>
+<p>[caption id="attachment_1358" align="aligncenter" width="450" caption="改成这样之后，辨识度显然好了很多"]<a href="http://blog.mycolorway.com/wp-content/uploads/2010/08/icons_change.png"><img class="size-full wp-image-1358" title="icons_change" src="http://blog.mycolorway.com/wp-content/uploads/2010/08/icons_change.png" alt="改成现在这样之后，辨识度显然好了很多" width="450" height="333" /></a>[/caption]</p>
+<p>[caption id="attachment_1359" align="aligncenter" width="450" caption="在内部票选过程中被淘汰的其他版本"]<a href="http://blog.mycolorway.com/wp-content/uploads/2010/08/br_icons1.png"><img class="size-full wp-image-1359" title="br_icons" src="http://blog.mycolorway.com/wp-content/uploads/2010/08/br_icons1.png" alt="其他在内部票选过程中被淘汰的版本" width="450" height="100" /></a>[/caption]</p>
+<p>[caption id="attachment_1360" align="aligncenter" width="450" caption="《牛壹周》新ICON定妆照"]<a href="http://blog.mycolorway.com/wp-content/uploads/2010/08/br_icon.png"><img class="size-full wp-image-1360" title="br_icon" src="http://blog.mycolorway.com/wp-content/uploads/2010/08/br_icon.png" alt="《牛壹周》新ICON定妆照" width="450" height="450" /></a>[/caption]</p>
+<p>牛角代表牛，壹就是壹，Weekly表示周刊——现在，由图形、汉字和英文混搭的这个《牛壹周》Icon新版本看上去象个漂亮精神的混血儿。：）</p>
+<h4>5、现在还不完美，未来值得期待</h4>
+<p>到目前为止，《牛壹周》依然是一本实验性的杂志，我们还在对更好的体验进行探索和尝试。在它基本定型之前，我们并不一定保证它每周都能按期推出，但我们会让它每一次推出都比上一次更值得体验和期待。</p>
+<p>感谢《牛壹周》1.1版主力设计与开发Shawn，为了这次的版本更新他几乎贡献了所有的双休日；感谢《牛壹周》8月11日第二期主编古灵，作为一个非著名愤青，他让这期充满了时政浓重的体味；感谢为《牛壹周》第一期和第二期提供排版的Fish，她在Indesign上投入的诸多心血，最终也让自己的排版技艺达到了和她的厨艺一样精湛。</p>
+<p>我们期待不断的听到来自你们的反馈，对于这本杂志有任何意见和建议，欢迎写信给我们，我们的邮箱是<a href="mailto:team%2Bipad@mycolorway.com" target="_blank">team+ipad@mycolorway.com</a>，或者Follow我们的Twitter账号：@bullreader ，让我们一起阅读、触摸和设计，让她变得更好。</p>

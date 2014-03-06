@@ -1,0 +1,80 @@
+---
+layout: post
+title: 《牛壹周》1.1 更新手记
+categories:
+- iPhone/iPad
+tags:
+- ASIHTTPRequest
+- Bullreader
+- bullweekly
+- ipad
+- iphone
+- update
+- webkit
+- WWDC
+- 手记
+- 更新
+- 牛一周
+- 牛壹周
+status: publish
+type: post
+published: true
+meta:
+  _edit_last: '3'
+  views: '13923'
+---
+<p><a rel="attachment wp-att-1428" href="http://mycolorway.com/blog/2010/08/31/bullweekly-update-1-1/nyz1-1/"><img class="alignnone size-full wp-image-1428" title="nyz1-1" src="http://mycolorway.com/blog/wp-content/uploads/2010/08/nyz1-1.png" alt="" width="580" height="180" /></a></p>
+<p>《牛壹周》上线至今有一个月了（<a href="http://ax.itunes.apple.com/cn/app/id383294418?mt=8#ls=1" target="_blank">您可以点这里查看store上的页面</a>），幸运的是从第一个版本上线以来，我们收到了很多建议。</p>
+<p>在大家的支持下， 我们无论是从内容还是从程序上都进行了大量的调整。</p>
+<p>老妖在《 <a href="http://mycolorway.com/blog/2010/08/18/br11-design-update/" target="_self">&lt;牛壹周&gt;1.1升级版的设计与功能改进</a> 》中已经向大家展示了在1.1版本更新时所做的调整。我就不再博客再重复了， 本篇手记更倾向于我们为什么做了这些优化？我们到底是怎么想的哩？以及是怎么实现的。</p>
+<h4><!--more-->1、更平滑的页面切换缓冲</h4>
+<p>热心的网友在邮件中指出：</p>
+<blockquote style="border-left: 5px solid #F18C0F; margin-left: 10px; padding: 3px 0 3px 10px; quotes: none;"><p><strong>翻页设计的小缺陷。篇章与篇章间过渡时，会出现短暂的黑屏和白菊花，让人误以为是程序Crash了（我和几名同事有相似的体验）。</strong></p></blockquote>
+<p>或者热心的网友在app store评论中指出：</p>
+<blockquote style="border-left: 5px solid #F18C0F; margin-left: 10px; padding: 3px 0 3px 10px; quotes: none;">
+<div>
+<div>用心做的一个app<br />
+by <strong> 冬天的林子 </strong> on 30-Jul-2010 version 1.0</p>
+<div><img src="https://www.appfigures.com/images/4_stars.png" alt="4 stars" /></div>
+</div>
+</div>
+<p>质量在国内杂志类里面也算好的了.<br />
+有 一个问题,相比较国外一些同类的精品应用,为何翻页时缓冲的时间会相差这么多啊  ,我看那些杂志几乎没有缓冲,一个动作就载入,连贯至极,而这个在同一篇文章多页面翻页时效果也很好,但是<strong>在换不同文章时无论上翻还是下翻几乎都有1-2 秒的风火轮,影响了阅读体验,作为一本离线杂志应该还可以优化</strong>.</p></blockquote>
+<p>针对这一问题，几乎彻底地改变了我们的程序结构。但是目前看来，这种结构调整是值得的。在我们结构调整后，优化了两个细节上的体验：</p>
+<p>1. 上一版本中文章的切换需要用户手拖动文章超出一定的区域才会载入下一篇文章。这种操作的体验方式被iphone中大量使用，例如QQ空间，Mobile RSS等。这种体验的方式优点在于用户不需要再去手动切换到导航再点下一篇文章继续阅读。 在程序员的逻辑中，这显然是很不错的解决办法，一个scroll view，被拖动出预设的阈值， 触发一个事件，载入下篇文章  bu la bu la... 鄂～～～ 我们是没有见过看一本现实生活中的杂志翻页会有一个弹簧黏住两页-_-  ，因此这种程序员逻辑很快就被我们操翻了。 于是我们改进了翻页的效果，实现了文章间切换也没有边界。</p>
+<div><img class="alignnone size-full wp-image-1409" title="before-after" src="http://mycolorway.com/blog/wp-content/uploads/2010/08/before-after.jpg" alt="" width="580" height="300" /></div>
+<p>2. 上一版本中，文章的切换载入需要用户花一些时间等待，等待的界面如下图所示，这就是传说中被很多人误认的宕机小菊花。1.1的更新里，我们从技术上优化了， 在正常的阅读情况下，您再也不会看到万恶的菊花了。 只有当您把看书翻页当成滚卫生纸的时候，才会出现下面的牛头牛汗。</p>
+<div><img class="alignnone size-full wp-image-1408" title="before-after-loading" src="http://mycolorway.com/blog/wp-content/uploads/2010/08/before-after-loading.jpg" alt="" width="580" height="300" /></div>
+<h4>2、全新的“一阳指”导航系统</h4>
+<p>还记得以前的导航方式吗？没错，把书推上去，能看到每篇文章的那个。 在我们做测试的过程中发现， 在对牛壹周不熟的朋友们一不小心碰了一下书就从下面推出来一排长得很像页面缩略又不太是页面缩略的图片。 一点任何一个图片就被弹到不知道哪里去了。 于是这个小朋友就很害怕碰书，因为一碰就不能继续阅读了。</p>
+<p>iPad中有很多应用的导航都是很不错的。列举一些</p>
+<p>1. 热点区域导航 如：USA Today</p>
+<p><img class="alignnone size-full wp-image-1410" title="usatoday" src="http://mycolorway.com/blog/wp-content/uploads/2010/08/usatoday.jpg" alt="" width="580" height="435" /></p>
+<p>USA Today，Editor's Choice， 南方周末 这一类的应用程序都采用的是热点区域导航的方式。 没有专门的导航栏，导航可以通过点击文章标题或者图片完成。 这种导航方式很适合报纸类的APP，文章相对独立。</p>
+<p>2.  导航条导航 如：Time Magazine，Wired</p>
+<p><img class="alignnone size-full wp-image-1411" title="time-mag" src="http://mycolorway.com/blog/wp-content/uploads/2010/08/time-mag.jpg" alt="" width="580" height="435" /></p>
+<p>上图是Time Magazine，点出导航条后可以看到每篇文章的缩略，很容易地实现快速导航。但是Time Magazine的这种导航还是太复杂了。</p>
+<p>相比之下，我们更喜欢另一本杂志的导航方式：Wired</p>
+<p><img class="alignnone size-full wp-image-1412" title="wired" src="http://mycolorway.com/blog/wp-content/uploads/2010/08/wired.jpg" alt="" width="580" height="435" /></p>
+<p>Wired的导航是点击后出现的，不过不一样的是，Wired的导航占用的空间十分小，是一个滚动条的样式。</p>
+<p>当手指按到滚动条后会看这样的界面：</p>
+<p><img class="alignnone size-full wp-image-1413" title="wired-menu" src="http://mycolorway.com/blog/wp-content/uploads/2010/08/wired-menu.jpg" alt="" width="580" height="435" /></p>
+<p>但这样的导航缺点就在于，操作区和用户焦点区分离。 也就是说，手在下面划动，而文章信息的窗口却永远在中心，划动的时候不得不用余光保持手划动不超出屏幕范围。而且松手就自动跳转使得操作过程十分紧张，因为一不小心就进行了文章间的跳转。</p>
+<p>在综合大量的APP设计后，我们设计了全新的一阳指导航系统</p>
+<p>1.  首先，我们能不能让导航类似Wired，但是让用户操作区和焦点区不要分离得这么远呢？</p>
+<p>于是我们有了这样的设计：</p>
+<p><img class="alignnone size-full wp-image-1414" title="bar1" src="http://mycolorway.com/blog/wp-content/uploads/2010/08/bar1.jpg" alt="" width="580" height="435" /></p>
+<p>2. 额， 还行，看起来也像个样子了，但是对于牛一周选文就这么几篇，而且分类也就这么几类，对于我而言，看时政方面的内容是我最后才会阅读的。首先我找找有没有柴静姐姐写的没哇？有的话先看，然后再看看科普是什么呀，接着看科普，然后再看完文学，最后啃时政和经济部分。 我相信对于不同的人都有不同的喜好。</p>
+<p>那能不能在滚动条上表现出文章的区域呢？</p>
+<p>记得我们牛壹周第一期的网友，也许会注意到我们的分类是分了颜色的，时政是刺眼的红，文学是清新的绿...... 我们为什么不把这放到滚动条上呢？</p>
+<p>于是我们就得到了彩虹条，快速了解到当前期的文章比例，或者快速跳转到某部分：</p>
+<p><img class="alignnone size-full wp-image-1416" title="yyz" src="http://mycolorway.com/blog/wp-content/uploads/2010/08/yyz.jpg" alt="" width="580" height="435" /></p>
+<p>牛壹周的导航部分Before and After</p>
+<p><img class="alignnone size-full wp-image-1418" title="before-after-NAVI" src="http://mycolorway.com/blog/wp-content/uploads/2010/08/before-after-NAVI.jpg" alt="" width="580" height="300" /></p>
+<p>技术上的改变：</p>
+<p>1. 渲染采用2D引擎PDF， 效率高于Webkit</p>
+<p>2. 渲染使用的是Tile技术。关于Tile的技术，WWDC2010中Session 104 Designing Apps with Scroll Views中有详细地描述，我就不再累赘重复了。</p>
+<p>3. 期刊和阅读器分离， 网络部分使用的是开源的ASIHTTPRequest ，十分强大，建议使用。文档在这里：<a href="http://allseeing-i.com/ASIHTTPRequest/" target="_blank">http://allseeing-i.com/ASIHTTPRequest/</a></p>
+<p>最后再罗唆几句， 如果在技术上或者模式上有什么需要帮助的或者探讨的。 欢迎给我们发邮件：<a href="mailto:team+ipad@gmail.com">team+ipad@gmail.com</a> 您也可以follow我们的Twitter: <a href="http://twitter.com/bullreader" target="_blank">@bullreader</a></p>
+<p>1.2的版本我们已经提交给了app store审批，不出意外，将于一周后和大家见面，在1.2版本中有更多改进。更新手记敬请期待。</p>
+<p><span style="color: #999999;">转载请注明出处,谢谢。 <a href="http://mycolorway.com/blog/2010/08/31/bullweekly-update-1-1/">http://mycolorway.com/blog/2010/08/31/bullweekly-update-1-1/</a></span></p>

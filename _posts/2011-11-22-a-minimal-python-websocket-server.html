@@ -1,0 +1,106 @@
+---
+layout: post
+title: 用Python实现一个简单的WebSocket服务器
+categories:
+- 随笔
+tags: []
+status: publish
+type: post
+published: true
+meta:
+  views: '13927'
+  _edit_last: '2'
+---
+<p><a rel="attachment wp-att-3705" href="http://blog.mycolorway.com/2011/11/22/a-minimal-python-websocket-server/html5socket-2/"><img class="alignnone size-full wp-image-3705" title="html5socket" src="http://blog.mycolorway.com/wp-content/uploads/2011/11/html5socket1.png" alt="" width="580" height="180" /></a></p>
+<p>最近在做的一个项目中需要使用到HTML5中引入的WebSocket技术，本来以为应该很容易就能搞定，谁知道在真正上手开发了以后才发现有很多麻烦的地方，虽然彩程是一个以前端开发和设计见长的团队，而且作为一个二手程序猿又长期不被待见，但是为了让有同样需求的朋友少走些弯路，我还是决定把实现方法贴在这个地方。</p>
+<p>关于WebSocket的基本概念，<a title="WebSocket" href="http://zh.wikipedia.org/wiki/WebSocket" target="_blank">维基百科</a>上解释的很清楚，而且网上也能搜出来一大把，这里就略过不表，直接进入正题。</p>
+<p>这次的问题首先有一个前提，就是得用Python来实现这个服务器，如果对具体语言没有限制的话，推荐大家首选<a title="nodjs" href="http://nodejs.org/" target="_blank">Node.js</a>的一个第三方库：<a title="socket.io" href="http://socket.io/" target="_blank">Socket.IO</a>，非常好用，10分钟不打针不吃药搞定WebSocket Server，而且用JS来写后端，相信也能对上很多文艺开发者的胃口。</p>
+<p>但是如果选择用Python，google搜索的结果几乎都不能用，最要命的问题是，WebSocket协议本身还是一个草案，所以不同浏览器支持的协议版本有所不同，Safari 5.1支持的是<a title="hybi-02" href="http://tools.ietf.org/html/draft-ietf-hybi-thewebsocketprotocol-02" target="_blank">老版本协议Hybi-02</a>，Chrome 15以及Firefox 8.0支持的是<a title="hybi-10" href="http://tools.ietf.org/html/draft-ietf-hybi-thewebsocketprotocol-10" target="_blank">新版本协议Hybi-10</a>，老版本协议和新版本协议在建立通信的握手方法还有数据传输的格式要求上都有所不同，导致网上大多数实现方式只能适用于Safari浏览器，并且Safari和C&amp;F浏览器之间无法互相通信。</p>
+<p><!--more--></p>
+<p>首先第一步需要解释的是新、旧版本WebSocket协议的握手方式。我们先来看看三个不同浏览器发送的握手数据的结构：</p>
+<p><strong>Chrome：</strong></p>
+<pre lang="text">GET / HTTP/1.1
+Upgrade: websocket
+Connection: Upgrade
+Host: 127.0.0.1:1337
+Sec-WebSocket-Origin: http://127.0.0.1:8000
+Sec-WebSocket-Key: erWJbDVAlYnHvHNulgrW8Q==
+Sec-WebSocket-Version: 8
+Cookie: csrftoken=xxxxxx; sessionid=xxxxx</pre>
+<p><strong>Firefox：</strong></p>
+<pre lang="text">GET / HTTP/1.1
+Host: 127.0.0.1:1337
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:8.0) Gecko/20100101 Firefox/8.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip, deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Connection: keep-alive, Upgrade
+Sec-WebSocket-Version: 8
+Sec-WebSocket-Origin: http://127.0.0.1:8000
+Sec-WebSocket-Key: 1t3F81iAxNIZE2TxqWv+8A==
+Cookie: xxx
+Pragma: no-cache
+Cache-Control: no-cache
+Upgrade: websocket</pre>
+<p><strong>Safari：</strong></p>
+<pre lang="text">GET / HTTP/1.1
+Upgrade: WebSocket
+Connection: Upgrade
+Host: 127.0.0.1:1337
+Origin: http://127.0.0.1:8000
+Cookie: sessionid=xxxx; calView=day; dayCurrentDate=1314288000000
+Sec-WebSocket-Key1: cV`p1* 42#7  ^9}_ 647  08{
+Sec-WebSocket-Key2: O8 415 8x37R A8   4
+;"######</pre>
+<p>可以看出，Chrome和Firefox实现的是新版协议，因此只传输了一个"Sec-WebSocket-Key"头以供服务端生成握手Token，但是遵循老版本的Safari的数据中有两个Key："Sec-WebSocket-Key1"和"Sec-WebSocket-Key2"，因此服务端在生成握手Token的时候，需要做一次判断。先来看使用老版本协议的Safari，Token生成算法如下：</p>
+<p>取出Sec-WebSocket-Key1中的所有数字字符形成一个数值，这里是1427964708，然后除以Key1中的空格数目，这里好像是6个空格，得到一个数值，保留该数值整数位，得到数值N1；对Sec-WebSocket-Key2如法炮制，得到第二个整数N2；把N1和N2按照Big-Endian字符序列连接起来，然后再与另外一个Key3连接，得到一个原始序列ser_key。那么Key3是什么呢？大家可以看到在Safari发送过来的握手请求最后，有一个8字节的奇怪的字符串“;"######”，这个就是Key3。回到ser_key，对这个原始序列做md5算出一个16字节长的digest，这就是老版本协议需要的token，然后将这个token附在握手消息的最后发送回Client，即可完成握手。</p>
+<p>新版协议生成Token的方法比较简单：首先把Sec-WebSocket-Key和一串固定的UUID “258EAFA5-E914-47DA-95CA-C5AB0DC85B11”做拼接，然后对这个拼接后的字符串做SHA1加密，得到digest以后，做一次base64编码，即可获得Token。</p>
+<p>另外需要注意的是，新版本和老版本握手协议回传给Client的数据结构有所不同，在附件中的server源码中写得很清楚了，看看就能明白。</p>
+<p>完成握手只是WebSocket Server的一半功能，现在只能保证这个Server能够和两个版本的浏览器建立链接了，但是如果试着把Chrome中的消息发送给Safari，会发现Safari无法接收。导致这个结果的原因，是因为两个版本的协议的Data Framing结构不同，也即是在握手建立连接后，Client发送和接收的数据结构都不一样。</p>
+<p>首先第一步需要获取不同版本协议下Client发送过来的原始数据。老版本协议比较简单，实际上就是在原始数据前加了个'\x00'，在最后面加上了一个'\xFF'，所以如果Safari的Client发送一个字符串'test'，实际上WebSocket Server收到的数据是：'x00test\xFF'，所以只需要剥离掉首尾那两个字符就可以了。</p>
+<p>比较麻烦的是新版本协议的数据，按照新版draft的解释，Chrome和Firefox发过来的数据报文由以下几个部分组成：首先是一个固定的字节（1000 0001或是1000 0002），这个字节可以不用理会。麻烦的是第二个字节，这里假设第二个字节是1011 1100，首先这个字节的第一位肯定是1，表示这是一个"masked"位，剩下的7个0/1位能够计算出一个数值，比如这里剩下的是 011 1100，计算出来就是60，这个值需要做如下判断：</p>
+<p>如果这个值介于0000 0000 和 0111 1101 (0 ~ 125) 之间，那么这个值就代表了实际数据的长度；如果这个数值刚好等于0111 1110 (126)，那么接下来的2个字节才代表真实数据长度；如果这个数值刚好等于0111 1111 (127)，那么接下来的8个字节代表数据长度。</p>
+<p>有了这个判断之后，能够知道代表数据长度的字节在第几位结束，比如我们举得例子60，这个值介于0~125之间，所以第二个字节本身就代表了原始数据的长度了（60个字节），所以从第三个字节开始，我们能抓出4个字节来，这一串字节叫做 "masks" (掩码?)，掩码之后的数据，就是实际的data...的兄弟了。说是兄弟，是因为这个数据是实际data根据掩码做过一次位运算后得到的，获得原始data的方法是，将兄弟数据的每一位x，和掩码的第i%4位做xor运算，其中i是x在兄弟数据中的索引。看得眼花是吧，看看下面这个代码片段也许就能明白了：</p>
+<pre lang="python">def parse_data(msg):
+    code_length = ord(msg[1]) & 127
+
+    if code_length == 126:
+        masks = msg[4:8]
+        data = msg[8:]
+    elif code_length == 127:
+        masks = msg[10:14]
+        data = msg[14:]
+    else:
+        masks = msg[2:6]
+        data = msg[6:]
+
+    i = 0
+    raw_str = ''
+
+    for d in data:
+        raw_str += chr(ord(d) ^ ord(masks[i%4]))
+        i += 1</pre>
+<p>至此，已经可以顺利取出两个版本浏览器发送来的原始数据了。接下来，就是将这个原始数据封装成不同协议版本的需要的Client数据，发送给对应浏览器就可以了。支持老版本协议的Safari还是很简单，如果从Chrome或者Firefox发送来的原始数据是字符串'test'的话，按照之前解码的方式，前面加上一个'\x00'，最末加上一个'\xFF'，变成'\x00test\xFF'就可以发送给Safari接收了。如果是从Safari发送来的原始数据'test'，同样需要做解码的逆运算，唯一简单的，是不需要再用一个masks来生成一个兄弟数据了，从Server端发送原始的数据给Client就可以了。</p>
+<p>还是来模拟这个过程，首先数据的第一位仍旧是1000 0001('\x81')，接下来获取原始数据的长度data_length，根据长度是否超过125位，来生成1个字节或是3个字节的代表长度的位数（附件中的源码省略去了使用9个字节表示数据长度的情况，因为实际的Server不会传输那么大量的数据），最后再将该字节串和原始数据拼接起来，就可以了，代码片段如下：</p>
+<pre lang="python">def send_data(raw_str):
+    back_str = []
+
+    back_str.append('\x81')
+    data_length = len(raw_str)
+
+    if data_length < 125:
+        back_str.append(chr(data_length))
+    else:
+        back_str.append(chr(126))
+        back_str.append(chr(data_length >> 8))
+        back_str.append(chr(data_length & 0xFF))
+
+    back_str = "".join(back_str) + raw_str</pre>
+<p>这样生成的back_str，就能够发送给使用新版协议的Chrome或是Firefox了。</p>
+<p>至此，这个简单的WebSocket Server就完成了，能够同时兼容老版协议和新版协议的Socket连接，以及不同版本之间的数据传输。该Server的源码请<a href="/wp-content/uploads/2011/11/ws_server.tar.gz" target="_blank">点击这里下载</a>，需要注意的是里面用到了<a title="twisted" href="http://twistedmatrix.com/trac/" target="_blank">twisted</a>框架来跑TCP服务，代码写得不怎么样，仅供大家参考。</p>
+<p><strong>参考文档：</strong></p>
+<p><span style="font-size: 12px;">1、<a href="http://tools.ietf.org/html/draft-ietf-hybi-thewebsocketprotocol-17" target="_blank">The WebSocket protocol draft-ietf-hybi-thewebsocketprotocol-17</a></span><br />
+<span style="font-size: 12px;">2、<a href="http://stackoverflow.com/questions/7040078/how-to-deconstruct-data-frames-in-websockets-hybi-08" target="_blank">How to (de)construct data frames in WebSockets hybi 08+?</a></span><br />
+<span style="font-size: 12px;">3、<a href="http://blog.csdn.net/fenglibing/article/details/6852497" target="_blank">基于Websocket草案10协议的升级及基于Netty的握手实现</a></span><br />
+<span style="font-size: 12px;">4、<a href="http://tomsheep.net/abc-of-websocket/" target="_blank">ABC of WebSocket</a></span></p>
