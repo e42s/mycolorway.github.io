@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Simditor——Tower的新版编辑器
+author: 多发
 categories:
 - Tower
 published: true
