@@ -233,114 +233,17 @@ a {
 	.post-content {
 		margin: 40px 0 0 0;
 
-		p {
-			word-wrap: break-word;
-			line-height: 1.8;
-			margin: 0 0 20px 0;
-			color: #333;
+		span.red {
+			color: red;
 		}
-
-		h3 {
-			color: #000000;
-			font-size: 26px;
-			margin: 40px 0 20px 0;
+		span.grey {
+			color: #bbb;
 		}
-
-		h4 {
-			color: #000000;
-			font-size: 24px;
-			margin: 40px 0 20px 0;
-		}
-
-		h5, h6 {
-			color: #000000;
-			font-size: 20px;
-			margin: 40px 0 20px 0;
-		}
-
-		b, strong {
-			font-weight: bold;
-		}
-
-		i, em {
-			font-style: italic;
-		}
-
-		u {
+		span.underline {
 			text-decoration: underline;
 		}
-
-		ul, ol {
-			list-style:disc outside none;
-			margin: 20px 0;
-			padding: 0 0 0 40px;
-			line-height: 1.6;
-
-			ul, ol {
-				padding-left: 30px;
-			}
-		}
-
-		ol {
-			list-style:decimal;
-		}
-
-		img {
-			max-width: 600px;
-			border-radius: 4px;
-		}
-
-		blockquote {
-			border-left: 6px solid #ddd;
-			padding: 5px 0 5px 10px;
-			margin: 20px 0 20px 15px;
-
-			& > :first-child {
-				margin-top: 0;
-			}
-		}
-
-		pre {
-			padding: 5px 5px 5px 10px;
-			margin: 20px 0;
-			display: block;
-			font-family: 'monaco', 'Consolas', "Liberation Mono", Courier, monospace;
-			font-size:13px;
-			line-height: 18px;
-			background: #F0F0F0;
-			border-radius: 3px;
-			overflow-x: auto;
-			white-space: pre-wrap; /* CSS3 */
-			white-space: -moz-pre-wrap; /* Mozilla, post millennium */
-			white-space: -o-pre-wrap; /* Opera 7 */
-		}
-
-		hr {
-			display: block;
-			height: 0px;
-			border: 0;
-			border-top: 1px solid #ccc;
-			margin: 1em 0; padding: 0;
-		}
-
-		table {
-			max-width: 650px;
-			table-layout: fixed;
-			width: 100%;
-			border-collapse: collapse;
-			border-spacing: 0;
-			margin: 20px 0;
-
-			thead {
-				background-color: #f9f9f9;
-			}
-
-			td, th {
-				min-width: 40px;
-				border: 1px solid #ccc;
-				vertical-align: top;
-				padding: 2px 4px;
-			}
+		span.line-through {
+			text-decoration: line-through;
 		}
 	}
 }

@@ -14,7 +14,7 @@ title: 彩程设计博客
 			<span class="author">{{ post.author }}</span>
 			{% endif %}
 		</p>
-		<div class="post-content">
+		<div class="post-content typo">
 			{% if post.content contains site.excerpt_separator %}
 			{{ post.excerpt }}
 			<p><a href="{{ post.url | remove_first: '/' }}">继续阅读...</a></p>
