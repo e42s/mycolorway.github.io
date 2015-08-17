@@ -1,0 +1,15 @@
+{
+  "name": "blog",
+  "version": "0.0.1",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "assets/vendor/",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "typo.css": "~2.1.2"
+  }
+}

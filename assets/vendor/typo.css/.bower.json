@@ -1,0 +1,15 @@
+{
+  "name": "typo.css",
+  "homepage": "https://github.com/sofish/typo.css",
+  "version": "2.1.2",
+  "_release": "2.1.2",
+  "_resolution": {
+    "type": "version",
+    "tag": "2.1.2",
+    "commit": "337e79fa076d79876b88a8a210cca2e9d07c1b5e"
+  },
+  "_source": "git://github.com/sofish/typo.css.git",
+  "_target": "~2.1.2",
+  "_originalSource": "typo.css",
+  "_direct": true
+}
