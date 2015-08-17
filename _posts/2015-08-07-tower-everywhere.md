@@ -7,7 +7,6 @@ tags:
 status: publish
 type: post
 published: true
-author: Sebrina
 excerpt: 我在杭州的江边、在广州的雨中、在丽江的雪山下、在西昌的烧烤架旁、在三亚的沙滩边、在河北的家里……敲代码。是不是很酷炫？！岂止是 Tower Everywhere！简直是 Tower Everywhere！
 ---
 <!--more-->

@@ -7,7 +7,6 @@ tags:
 status: publish
 type: post
 published: true
-author: Sebrina
 excerpt: 在他口中南昌这座城市就像一座孤岛——「没人交流，什么消息到我这儿基本都是二手消息了」
 ---
 <!--more-->

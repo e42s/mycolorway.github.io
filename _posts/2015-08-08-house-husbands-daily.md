@@ -7,7 +7,6 @@ tags:
 status: publish
 type: post
 published: true
-author: Sebrina
 excerpt: 媳妇儿更满意，因为从此我不用出门上班，可以一手包办家里的电费、水费、物业费、公交充值、买菜等等杂活，＃非典型家（cheng）庭（xu）妇（yuan）男＃就此产生（笑cry），嗯，没错我就是顾家的巨蟹座。
 ---
 <!--more-->

@@ -7,7 +7,6 @@ tags:
 status: publish
 type: post
 published: true
-author: Sebrina
 excerpt: 除了每周五下午的交流分享会必须出席外，其他时间，我都能开开心心的抱着猫儿在家找个舒服的角落，这样的生活，深得我心。
 ---
 <!--more-->
