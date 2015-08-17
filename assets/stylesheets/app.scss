@@ -126,6 +126,9 @@ a {
 				font-size: 16px;
 				color: #aaa;
 			}
+			&.inline-xs, &.weibo-link, &.rss-link {
+				display: none;
+			}
 		}
 	}
 
@@ -164,9 +167,8 @@ a {
 	margin-left: auto;
 	padding-left: 15px;
 	padding-right: 15px;
+	box-sizing: border-box;
 }
-
-
 
 /*  Home  */
 
@@ -176,7 +178,8 @@ a {
 	}
 
 	.pagination {
-		width: 600px;
+		width: 90%;
+		max-width: 600px;
 		margin: 0 auto 40px;
 		height: 30px;
 		font-size: 18px;
@@ -202,7 +205,8 @@ a {
 /* style for all post */
 
 .post {
-	width: 600px;
+	width: 90%;
+	max-width: 600px;
 	margin: 0 auto 100px;
 
 	h2 {
@@ -248,8 +252,6 @@ a {
 	}
 }
 
-
-
 /* styles for different devices */
 
 @media (max-width: 767px) {
@@ -290,31 +292,14 @@ a {
 						opacity: 0.8;
 					}
 				}
+				&.inline-xs, &.weibo-link, &.rss-link {
+					display: inline-block;
+				}
 			}
 		}
 
 		.social {
-			float: none;
-			width: 100%;
-			margin: 15px auto 0;
-			li {
-				margin: 0 8px;
-				a {
-					width: 30px; height: 30px;
-					&:hover {
-						opacity: 0.8;
-					}
-				}
-				a.rss {
-					@include at2x('../images/rss', png, 100% , auto);
-				}
-				a.weixin {
-					@include at2x('../images/weixin', png, 100% , auto);
-				}
-				a.weibo {
-					@include at2x('../images/weibo', png, 100% , auto);
-				}
-			}
+			display: none;
 		}
 
 		.weixin-info {
