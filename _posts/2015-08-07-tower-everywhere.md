@@ -69,7 +69,7 @@ excerpt: 我在杭州的江边、在广州的雨中、在丽江的雪山下、�
 
 
 [lijiang01]:/assets/images/blog/2015-08-07-tower-everywhere/lijiang01.jpg
-[doge]:/assets/images/blog/2015-08-07-tower-everywhere/doge.jpg
+[doge]:/assets/images/blog/2015-08-07-tower-everywhere/doge.png
 [chengdu01]:/assets/images/blog/2015-08-07-tower-everywhere/chengdu01.jpg
 [chengdu02]:/assets/images/blog/2015-08-07-tower-everywhere/chengdu02.jpg
 [hangzhou]:/assets/images/blog/2015-08-07-tower-everywhere/hangzhou.jpg
