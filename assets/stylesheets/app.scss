@@ -264,9 +264,7 @@ a {
 		}
 
 		.nav li {
-			&:first-child {
-				margin: 0 25px;
-			}
+			margin-left: 20px;
 			a { font-size: 12px; }
 		}
 	}
