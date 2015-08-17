@@ -1,11 +1,10 @@
 encoding: utf-8
 name: 彩程设计博客
-url: http://blog.mycolorway.com/
 description: 彩程设计官方博客
 
 markdown: redcarpet
 highlighter: pygments
-exclude: ['LICENSE', 'README.md']
+exclude: ['LICENSE', 'README.md', 'bower.json', 'Gemfile', 'Gemfile.lock']
 paginate: 10
 paginate_path: 'page:num'
 excerpt_separator: '<!--more-->'
@@ -13,4 +12,3 @@ permalink: '/:year/:month/:day/:title.html'
 
 sass:
   sass_dir: assets/stylesheets
-
